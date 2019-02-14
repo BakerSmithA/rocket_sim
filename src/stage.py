@@ -84,8 +84,12 @@ class Stage:
         :param dt: delta time since last step.
         :return: new state of the stage, e.g. with decreased mass.
         """
-        new_prop_mass = self.step_propellant_mass_kg(dt, self.propellant_mass_kg)
-        new_thrust_N = self.step_thrust_N(dt, self.thrust_N)
+        if self.propellant_mass_kg > 0.0:
+            new_prop_mass = self.step_propellant_mass_kg(dt, self.propellant_mass_kg)
+            new_thrust_N = self.step_thrust_N(dt, self.thrust_N)
+        else:
+            new_prop_mass = 0.0
+            new_thrust_N = 0.0
 
         return Stage(self.area_m2, self.impulse_Ns, self.empty_mass_kg, self.engine_case_mass_kg, new_prop_mass,
                      new_thrust_N, self.step_propellant_mass_kg, self.step_thrust_N)

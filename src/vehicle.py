@@ -1,7 +1,7 @@
 from src.flight_comp import CompState, Action
 from src.stage import Stage
 from src.state import VehicleState
-from typing import List
+from typing import Optional, List, Tuple
 
 
 class Vehicle:
@@ -11,6 +11,7 @@ class Vehicle:
     computer_state: CompState
 
     stage: Stage
+    curr_engine_stage: int
     engine_stages: List[Stage]
     parachute_stage: Stage
 
@@ -20,6 +21,7 @@ class Vehicle:
     def __init__(self,
                  computer_state: CompState,
                  stage: Stage,
+                 curr_engine_stage: int,
                  engine_stages: List[Stage],
                  parachute_stage: Stage,
                  state: VehicleState,
@@ -34,6 +36,7 @@ class Vehicle:
         """
         self.computer_state = computer_state
         self.stage = stage
+        self.curr_engine_stage = curr_engine_stage
         self.engine_stages = engine_stages
         self.parachute_stage = parachute_stage
         self.state = state
@@ -48,12 +51,21 @@ class Vehicle:
 
         next_state = self.state.step(new_total_time, self.stage)
         actions, next_comp_state = self.computer_state.transition(self.state, next_state)
-        next_stage = self._interpret(actions).step(dt)
+        next_engine_stage, next_stage = self._interpret(actions).step(dt)
 
-        return Vehicle(next_comp_state, next_stage, self.engine_stages, self.parachute_stage, next_state, new_total_time)
+        return Vehicle(next_comp_state, next_stage, next_engine_stage, self.engine_stages, self.parachute_stage,
+                       next_state, new_total_time)
 
-    def _interpret(self, actions: List[Action]) -> Stage:
+    def _interpret(self, action: Optional[Action]) -> Tuple[int, Stage]:
         """
         :return: interpretation of next stage to 'segue' to.
         """
-        pass
+        if action is None:
+            return self.curr_engine_stage, self.stage
+        elif action == Action.NEXT_STAGE:
+            return self.curr_engine_stage+1, self.engine_stages[self.curr_engine_stage+1]
+        elif action == Action.PARACHUTE:
+            return self.curr_engine_stage, self.parachute_stage
+
+        raise RuntimeError('Bad action')
+
