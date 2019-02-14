@@ -16,7 +16,6 @@ class Vehicle:
     parachute_stage: Stage
 
     state: VehicleState
-    total_time: float
 
     def __init__(self,
                  computer_state: CompState,
@@ -24,15 +23,13 @@ class Vehicle:
                  curr_engine_stage: int,
                  engine_stages: List[Stage],
                  parachute_stage: Stage,
-                 state: VehicleState,
-                 total_time: float):
+                 state: VehicleState):
         """
         :param computer_state: initial state of the computer.
         :param stage: current stage, e.g. engine being fired.
         :param engine_stages: list of stages which can be fired, in order which they should be fired.
         :param parachute_stage: stage to transition to to release parachute.
         :param state: current state of the vehicle.
-        :param total_time: total time elapsed.
         """
         self.computer_state = computer_state
         self.stage = stage
@@ -40,21 +37,22 @@ class Vehicle:
         self.engine_stages = engine_stages
         self.parachute_stage = parachute_stage
         self.state = state
-        self.total_time = total_time
 
     def step(self, dt: float) -> 'Vehicle':
         """
         :param dt: delta time, i.e. resolution.
         :return: next state of the vehicle.
         """
-        new_total_time = self.total_time + dt
+        new_total_time = self.state.time_s + dt
 
-        next_state = self.state.step(new_total_time, self.stage)
-        actions, next_comp_state = self.computer_state.transition(self.state, next_state)
-        next_engine_stage, next_stage = self._interpret(actions).step(dt)
+        actions, next_comp_state = self.computer_state.transition(self.state, self.state)
+        next_engine_stage, next_stage = self._interpret(actions)
+        next_stage = next_stage.step(dt)
 
-        return Vehicle(next_comp_state, next_stage, next_engine_stage, self.engine_stages, self.parachute_stage,
-                       next_state, new_total_time)
+        next_state = VehicleState.from_stage(new_total_time, next_stage)
+
+        return Vehicle(next_comp_state, next_stage, next_engine_stage, self.engine_stages,
+                       self.parachute_stage, next_state)
 
     def _interpret(self, action: Optional[Action]) -> Tuple[int, Stage]:
         """

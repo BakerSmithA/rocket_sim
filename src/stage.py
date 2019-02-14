@@ -32,12 +32,25 @@ def choice(threshold_s: total_time_s, pre: T, post: T) -> param(T):
     """
     total_time = 0.0
 
-    def f(dt: delta_time_s) -> T:
+    def f(dt: delta_time_s, _: T) -> T:
         nonlocal total_time
         total_time += dt
         if total_time <= threshold_s:
             return pre
         return post
+
+    return f
+
+
+def linear(dx_per_sec: T) -> T:
+    """
+    Increase/decrease amount linearly.
+    :param dx_per_sec: amount to modify by per second.
+    :return: function which decreases x by dx_per_sec per second.
+    """
+    def f(dt: delta_time_s, prev_x: T) -> T:
+        dx = dx_per_sec * dt
+        return prev_x + dx
 
     return f
 
@@ -54,9 +67,8 @@ class Stage:
     impulse_Ns: float
     thrust_N: float
 
-    step_propellant_mass_kg: param(float)
-    step_impulse_Ns: param(float)
-    step_thrust_N: param(float)
+    f_propellant_mass_kg: param(float)
+    f_thrust_N: param(float)
 
     def __init__(self,
                  area_m2: float,
@@ -76,8 +88,8 @@ class Stage:
         self.propellant_mass_kg = propellant_mass_kg
         self.thrust_N = thrust_N
 
-        self.step_propellant_mass_kg = step_propellant_mass_kg
-        self.step_thrust_N = step_thrust_N
+        self.f_propellant_mass_kg = step_propellant_mass_kg
+        self.f_thrust_N = step_thrust_N
 
     def step(self, dt: delta_time_s) -> 'Stage':
         """
@@ -85,11 +97,11 @@ class Stage:
         :return: new state of the stage, e.g. with decreased mass.
         """
         if self.propellant_mass_kg > 0.0:
-            new_prop_mass = self.step_propellant_mass_kg(dt, self.propellant_mass_kg)
-            new_thrust_N = self.step_thrust_N(dt, self.thrust_N)
+            new_prop_mass = self.f_propellant_mass_kg(dt, self.propellant_mass_kg)
+            new_thrust_N = self.f_thrust_N(dt, self.thrust_N)
         else:
             new_prop_mass = 0.0
             new_thrust_N = 0.0
 
         return Stage(self.area_m2, self.impulse_Ns, self.empty_mass_kg, self.engine_case_mass_kg, new_prop_mass,
-                     new_thrust_N, self.step_propellant_mass_kg, self.step_thrust_N)
+                     new_thrust_N, self.f_propellant_mass_kg, self.f_thrust_N)

@@ -16,8 +16,10 @@ class VehicleState:
         self.drag_N = drag_N
         self.thrust_N = thrust_N
 
-    def accel_ms2(self) -> float:
-        pass
+    @classmethod
+    def from_stage(cls, time_s: float, stage: Stage) -> 'VehicleState':
+        mass_kg = stage.empty_mass_kg + stage.engine_case_mass_kg + stage.propellant_mass_kg
+        drag_N = 0.0
+        total_N = stage.thrust_N - drag_N
 
-    def step(self, time: float, stage: Stage) -> 'VehicleState':
-        pass
+        return VehicleState(time_s, mass_kg, stage.thrust_N, total_N)
