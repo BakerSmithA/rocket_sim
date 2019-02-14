@@ -44,6 +44,20 @@ while curr_time < end_time_s:
 
     curr_time += dt
 
-data = [s.dist_m for s in states]
-plt.plot(data)
+dist_data = [s.dist_m for s in states]
+plt.plot(dist_data)
+plt.xlabel('Time (s)')
+plt.ylabel('Altitude (m)')
+plt.show()
+
+dist_data = [s.velocity_ms for s in states]
+plt.plot(dist_data)
+plt.xlabel('Time (s)')
+plt.ylabel('Velocity (m/s)')
+plt.show()
+
+dist_data = [s.accel_ms2 for s in states]
+plt.plot(dist_data)
+plt.xlabel('Time (s)')
+plt.ylabel('Acceleration (m/s2)')
 plt.show()
