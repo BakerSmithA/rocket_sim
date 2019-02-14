@@ -26,7 +26,6 @@ class CompState:
     """
     Stores state of flight computer and makes transitions to new computer states.
     """
-
     ts: List[transition]
 
     def __init__(self, ts: List[transition]):
