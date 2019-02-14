@@ -24,8 +24,8 @@ class VehicleState:
 
     def step(self, time_s: float, stage: Stage) -> 'VehicleState':
         mass_kg = stage.empty_mass_kg + stage.engine_case_mass_kg + stage.propellant_mass_kg
-        drag_N = 0.0
-        total_N = stage.thrust_N - drag_N
+        drag_N = -9.81 * mass_kg
+        total_N = stage.thrust_N + drag_N
         accel_ms2 = total_N / mass_kg
         velocity_ms = self.velocity_ms + accel_ms2
         dist_m = self.dist_m + self.velocity_ms
