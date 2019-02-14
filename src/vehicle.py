@@ -49,7 +49,7 @@ class Vehicle:
         next_engine_stage, next_stage = self._interpret(actions)
         next_stage = next_stage.step(dt)
 
-        next_state = VehicleState.from_stage(new_total_time, next_stage)
+        next_state = self.state.step(new_total_time, next_stage)
 
         return Vehicle(next_comp_state, next_stage, next_engine_stage, self.engine_stages,
                        self.parachute_stage, next_state)

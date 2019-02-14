@@ -19,16 +19,15 @@ def idle_stage1_transition(prev: VehicleState, now: VehicleState, comp: CompStat
 
 comp_idle.add_transition(idle_stage1_transition)
 
-stage0 = Stage(area_m2=0.0, impulse_Ns=0.0, empty_mass_kg=0.0, engine_case_mass_kg=0.0, propellant_mass_kg=0.0,
+stage0 = Stage(area_m2=0.0, impulse_Ns=0.0, empty_mass_kg=5.0, engine_case_mass_kg=0.5, propellant_mass_kg=5.0,
                thrust_N=0.0, step_propellant_mass_kg=const(0.0), step_thrust_N=const(0.0))
 
 stage1 = Stage(area_m2=1, impulse_Ns=700, empty_mass_kg=5.0, engine_case_mass_kg=0.5, propellant_mass_kg=5.0,
                thrust_N=11.0, step_propellant_mass_kg=linear(-0.5), step_thrust_N=const(11))
 
-state = VehicleState.from_stage(0.0, stage0)
+state = VehicleState(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
 vehicle = Vehicle(comp_idle, stage0, 0, [stage0, stage1], None, state)
-
 
 #########
 
@@ -45,7 +44,6 @@ while curr_time < end_time_s:
 
     curr_time += dt
 
-data = [s.thrust_N for s in states]
+data = [s.dist_m for s in states]
 plt.plot(data)
-plt.ylabel('some numbers')
 plt.show()
