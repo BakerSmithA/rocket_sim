@@ -1,5 +1,5 @@
 
-class State:
+class VehicleState:
     """
     State of rocket at given point in time.
     """
@@ -13,4 +13,7 @@ class State:
         self.mass_kg = mass_kg
         self.drag_N = drag_N
         self.thrust_N = thrust_N
+
+    def accel_ms2(self) -> float:
+        pass
 
