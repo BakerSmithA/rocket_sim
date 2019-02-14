@@ -1,3 +1,5 @@
+from src.stage import Stage
+
 
 class VehicleState:
     """
@@ -17,3 +19,5 @@ class VehicleState:
     def accel_ms2(self) -> float:
         pass
 
+    def step(self, time: float, stage: Stage) -> 'VehicleState':
+        pass

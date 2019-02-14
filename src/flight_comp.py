@@ -7,9 +7,8 @@ class Action(Enum):
     """
     Actions the flight computer can instruct the vehicle to perform.
     """
-    STAGE_SEP = 0
-    FIRE_MOTOR = 1
-    PARACHUTE = 2
+    NEXT_STAGE = 0
+    PARACHUTE = 1
 
 
 T = TypeVar('T')
@@ -19,7 +18,7 @@ T = TypeVar('T')
 Mapping from previous and current vehicle states, and the current computer state, to the actions to take and the 
 next computer state.
 """
-transition = Callable[[VehicleState, VehicleState, T], Optional[Tuple[List[Action], 'CompState']]]
+transition = Callable[[VehicleState, VehicleState, T], Optional[Tuple[Optional[Action], 'CompState']]]
 
 
 class CompState:
@@ -34,7 +33,7 @@ class CompState:
     def add_transition(self, t: transition):
         self.ts.append(t)
 
-    def transition(self, prev: VehicleState, now: VehicleState) -> Tuple[[List[Action]], 'CompState']:
+    def transition(self, prev: VehicleState, now: VehicleState) -> Tuple[[Optional[Action]], 'CompState']:
         """
         :param prev: previous state of vehicle.
         :param now: current state of vehicle.
@@ -43,7 +42,7 @@ class CompState:
         """
         pass
 
-    def check(self, prev: VehicleState, now: VehicleState) -> Optional[Tuple[[List[Action]], 'CompState']]:
+    def check(self, prev: VehicleState, now: VehicleState) -> Optional[Tuple[[Optional[Action]], 'CompState']]:
         """
         Helper method for subclasses.
         :param prev: previous state of vehicle.
@@ -73,13 +72,13 @@ class Timer(CompState):
         super(Timer, self).__init__(ts)
         self.time_rem_s = time_rem_s
 
-    def transition(self, prev: VehicleState, now: VehicleState) -> Tuple[[List[Action]], CompState]:
+    def transition(self, prev: VehicleState, now: VehicleState) -> Tuple[[Optional[Action]], CompState]:
         r = self.check(prev, now)
         if r is not None:
             return r
 
         dt = now.time_s - prev.time_s
-        return [], Timer(self.ts, self.time_rem_s - dt)
+        return None, Timer(self.ts, self.time_rem_s - dt)
 
 
 class Id(CompState):
@@ -91,4 +90,4 @@ class Id(CompState):
         if r is not None:
             return r
 
-        return [], Id(self.ts)
+        return None, Id(self.ts)
