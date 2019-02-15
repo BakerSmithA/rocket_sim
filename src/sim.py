@@ -10,11 +10,21 @@ def single_stage() -> Vehicle:
     :return: description of a single stage vehicle without a parachute.
     """
     comp_burn = Id('Burn', [])
-    burn_stage = Stage(area_m2=0.5, empty_mass_kg=1.0, engine_case_mass_kg=0.015, propellant_mass_kg=0.0015,
-                       thrust_N=15.0, f_propellant_mass_kg=linear(-0.0015), f_thrust_N=const())
+    burn_stage = Stage(area_m2=0.005, drag_coefficient=0.75, empty_mass_kg=1.0, engine_case_mass_kg=0.015,
+                       propellant_mass_kg=0.0015, thrust_N=15.0, f_propellant_mass_kg=linear(-0.0015), f_thrust_N=const())
     state = VehicleState.zero()
 
     return Vehicle(comp_burn, burn_stage, [], None, state)
+
+
+# def single_stage_parachute() -> Vehicle:
+#     """
+#     :return: description of a single stage vehicle with a parachute.
+#     """
+#     comp_burn = Id('Burn', [])
+#     comp_descent = Id('Descent', [])
+#
+#     return None
 
 
 def sim(v: Vehicle, dt: float) -> List[VehicleState]:
@@ -32,9 +42,11 @@ def sim(v: Vehicle, dt: float) -> List[VehicleState]:
         s = states[-1]
         return s.velocity_ms < 0 and s.dist_m <= 0
 
-    while not touched_down():
+    curr_time_s = 0.0
+    while not touched_down() and curr_time_s < 20.0:
         v = v.step(dt)
         states.append(v.state)
+        curr_time_s += dt
 
     return states
 

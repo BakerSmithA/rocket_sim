@@ -59,6 +59,7 @@ class Stage:
     Defines how rocket changes over time.
     """
     area_m2: float
+    drag_coefficient: float
     empty_mass_kg: float
     engine_case_mass_kg: float
 
@@ -71,6 +72,7 @@ class Stage:
 
     def __init__(self,
                  area_m2: float,
+                 drag_coefficient: float,
                  empty_mass_kg: float,
                  engine_case_mass_kg: float,
                  propellant_mass_kg: float,
@@ -79,6 +81,7 @@ class Stage:
                  f_thrust_N: param(float)):
 
         self.area_m2 = area_m2
+        self.drag_coefficient = drag_coefficient
         self.empty_mass_kg = empty_mass_kg
         self.engine_case_mass_kg = engine_case_mass_kg
 
@@ -100,5 +103,5 @@ class Stage:
             new_prop_mass = 0.0
             new_thrust_N = 0.0
 
-        return Stage(self.area_m2, self.empty_mass_kg, self.engine_case_mass_kg, new_prop_mass,
+        return Stage(self.area_m2, self.drag_coefficient, self.empty_mass_kg, self.engine_case_mass_kg, new_prop_mass,
                      new_thrust_N, self.f_propellant_mass_kg, self.f_thrust_N)
