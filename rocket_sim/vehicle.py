@@ -1,6 +1,6 @@
-from src.flight_comp import CompState, Action
-from src.stage import Stage
-from src.state import VehicleState
+from .flight_comp import CompState, Action
+from .stage import Stage
+from .state import VehicleState
 from typing import Optional, List, Tuple
 
 
@@ -25,7 +25,8 @@ class Vehicle:
         """
         :param computer_state: initial state of the computer.
         :param stage: current stage, e.g. engine being fired.
-        :param remaining_engine_stages: list of stages which to be fired after current stage, in order which they should be fired.
+        :param remaining_engine_stages: list of stages which to be fired after current stage, in order which they
+               should be fired.
         :param parachute_stage: stage to transition to to release parachute.
         :param state: current state of the vehicle.
         """

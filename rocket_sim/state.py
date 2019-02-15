@@ -1,6 +1,5 @@
-from src.stage import Stage
+from .stage import Stage
 from typing import Optional
-
 
 class VehicleState:
     """
@@ -17,7 +16,8 @@ class VehicleState:
     velocity_ms: float
     dist_m: float
 
-    def __init__(self, event: Optional[str], time_s: float, mass_kg: float, thrust_N: float, air_resistance_N: float, weight_N: float, net_force_N, accel_ms: float, velocity_ms: float, dist_m: float):
+    def __init__(self, event: Optional[str], time_s: float, mass_kg: float, thrust_N: float, air_resistance_N: float,
+                 weight_N: float, net_force_N, accel_ms: float, velocity_ms: float, dist_m: float):
         self.event = event
         self.time_s = time_s
         self.mass_kg = mass_kg

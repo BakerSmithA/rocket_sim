@@ -1,4 +1,4 @@
-from src.state import VehicleState
+from .state import VehicleState
 from typing import Tuple, Callable, TypeVar, List, Optional
 from enum import Enum
 
@@ -11,14 +11,11 @@ class Action(Enum):
     PARACHUTE = 1
 
 
-T = TypeVar('T')
-
-
 """
 Mapping from previous and current vehicle states, and the current computer state, to the actions to take and the 
 next computer state.
 """
-transition = Callable[[VehicleState, VehicleState, T], Optional[Tuple[Optional[Action], 'CompState']]]
+transition = Callable[[VehicleState, VehicleState, 'CompState'], Optional[Tuple[Optional[Action], 'CompState']]]
 
 
 class CompState:
@@ -35,7 +32,7 @@ class CompState:
     def add_transition(self, t: transition):
         self.ts.append(t)
 
-    def transition(self, prev: VehicleState, now: VehicleState):# -> Tuple[[Optional[Action]], 'CompState']:
+    def transition(self, prev: VehicleState, now: VehicleState) -> Tuple[Optional[Action], 'CompState']:
         """
         :param prev: previous state of vehicle.
         :param now: current state of vehicle.
@@ -44,7 +41,7 @@ class CompState:
         """
         pass
 
-    def check(self, prev: VehicleState, now: VehicleState):# -> Optional[Tuple[[Optional[Action]], 'CompState']]:
+    def check(self, prev: VehicleState, now: VehicleState) -> Optional[Tuple[Optional[Action], 'CompState']]:
         """
         Helper method for subclasses.
         :param prev: previous state of vehicle.
@@ -74,7 +71,7 @@ class Timer(CompState):
         super(Timer, self).__init__(name, ts)
         self.time_rem_s = time_rem_s
 
-    def transition(self, prev: VehicleState, now: VehicleState):# -> Tuple[[Optional[Action]], CompState]:
+    def transition(self, prev: VehicleState, now: VehicleState) -> Tuple[Optional[Action], CompState]:
         r = self.check(prev, now)
         if r is not None:
             return r
@@ -87,7 +84,7 @@ class Id(CompState):
     """
     Flight computer state that does not change over time.
     """
-    def transition(self, prev: VehicleState, now: VehicleState):# -> Tuple[[List[Action]], CompState]:
+    def transition(self, prev: VehicleState, now: VehicleState) -> Tuple[Optional[Action], CompState]:
         r = self.check(prev, now)
         if r is not None:
             return r
