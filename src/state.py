@@ -3,7 +3,7 @@ from src.stage import Stage
 
 class VehicleState:
     """
-    State of rocket at given point in time.
+    State of rocket at given point in time. Used to record data to plot.
     """
     time_s: float
     mass_kg: float
@@ -31,3 +31,7 @@ class VehicleState:
         dist_m = self.dist_m + self.velocity_ms
 
         return VehicleState(time_s, mass_kg, stage.thrust_N, total_N, accel_ms2, velocity_ms, dist_m)
+
+    @staticmethod
+    def zero() -> 'VehicleState':
+        return VehicleState(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)

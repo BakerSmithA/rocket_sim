@@ -14,13 +14,12 @@ def param(X: Type) -> Type:
     return Callable[[delta_time_s, X], X]
 
 
-def const(x: T) -> param(T):
+def const() -> param(T):
     """
-    Parameter of stage which does not change over time.
-    :param x: returned by returned function.
-    :return: function which returns constant x.
+    Parameter of stage which does not change over time from initial value.
+    :return: function which returns previous value.
     """
-    return lambda dt, prev_x: x
+    return lambda _, prev_x: prev_x
 
 
 def choice(threshold_s: total_time_s, pre: T, post: T) -> param(T):
@@ -72,24 +71,22 @@ class Stage:
 
     def __init__(self,
                  area_m2: float,
-                 impulse_Ns: float,
                  empty_mass_kg: float,
                  engine_case_mass_kg: float,
                  propellant_mass_kg: float,
                  thrust_N: float,
-                 step_propellant_mass_kg: param(float),
-                 step_thrust_N: param(float)):
+                 f_propellant_mass_kg: param(float),
+                 f_thrust_N: param(float)):
 
         self.area_m2 = area_m2
-        self.impulse_Ns = impulse_Ns
         self.empty_mass_kg = empty_mass_kg
         self.engine_case_mass_kg = engine_case_mass_kg
 
         self.propellant_mass_kg = propellant_mass_kg
         self.thrust_N = thrust_N
 
-        self.f_propellant_mass_kg = step_propellant_mass_kg
-        self.f_thrust_N = step_thrust_N
+        self.f_propellant_mass_kg = f_propellant_mass_kg
+        self.f_thrust_N = f_thrust_N
 
     def step(self, dt: delta_time_s) -> 'Stage':
         """
@@ -103,5 +100,5 @@ class Stage:
             new_prop_mass = 0.0
             new_thrust_N = 0.0
 
-        return Stage(self.area_m2, self.impulse_Ns, self.empty_mass_kg, self.engine_case_mass_kg, new_prop_mass,
+        return Stage(self.area_m2, self.empty_mass_kg, self.engine_case_mass_kg, new_prop_mass,
                      new_thrust_N, self.f_propellant_mass_kg, self.f_thrust_N)

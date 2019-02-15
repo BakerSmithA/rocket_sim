@@ -3,61 +3,49 @@ from src.flight_comp import *
 from src.stage import *
 from src.state import VehicleState
 import matplotlib.pyplot as plt
-from typing import Tuple, Optional
 
 
-comp_idle = Id('Idle', [])
-comp_burn = Id('Burn', [])
-
-
-def idle_stage1_transition(prev: VehicleState, now: VehicleState, comp: CompState) -> Optional[Tuple[Optional[Action], CompState]]:
+def single_stage() -> Vehicle:
     """
-    Fire first stage motor.
+    :return: description of a single stage vehicle without a parachute.
     """
-    return Action.NEXT_STAGE, comp_burn
+    comp_burn = Id('Burn', [])
+    burn_stage = Stage(area_m2=0.5, empty_mass_kg=1.0, engine_case_mass_kg=0.015, propellant_mass_kg=0.0015,
+                       thrust_N=15.0, f_propellant_mass_kg=linear(-0.00075), f_thrust_N=const())
+    state = VehicleState.zero()
+
+    return Vehicle(comp_burn, burn_stage, [], None, state)
 
 
-comp_idle.add_transition(idle_stage1_transition)
+def sim(v: Vehicle) -> List[VehicleState]:
+    """
+    :param v: vehicle to simulate.
+    :return: acceleration, velocity, and altitude of vehicle until it returns to ground.
+    """
+    dt = 0.1
+    end_time_s = 5.0
+    curr_time = 0.0
 
-stage0 = Stage(area_m2=0.0, impulse_Ns=0.0, empty_mass_kg=5.0, engine_case_mass_kg=0.5, propellant_mass_kg=5.0,
-               thrust_N=0.0, step_propellant_mass_kg=const(0.0), step_thrust_N=const(0.0))
+    states = []
 
-stage1 = Stage(area_m2=1, impulse_Ns=700, empty_mass_kg=5.0, engine_case_mass_kg=0.5, propellant_mass_kg=5.0,
-               thrust_N=0.0, step_propellant_mass_kg=linear(-0.5), step_thrust_N=const(200))
+    while curr_time < end_time_s:
+        v = v.step(dt)
+        states.append(v.state)
 
-state = VehicleState(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        curr_time += dt
 
-vehicle = Vehicle(comp_idle, stage0, 0, [stage0, stage1], None, state)
-
-#########
+    return states
 
 
-dt = 0.1
-end_time_s = 45.0
-curr_time = 0.0
+def plot(data: List[float], x_label: str, y_label: str):
+    plt.plot(data)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.show()
 
-states = []
 
-while curr_time < end_time_s:
-    states.append(vehicle.state)
-    vehicle = vehicle.step(dt)
+states = sim(single_stage())
 
-    curr_time += dt
-
-dist_data = [s.dist_m for s in states]
-plt.plot(dist_data)
-plt.xlabel('Time (s)')
-plt.ylabel('Altitude (m)')
-plt.show()
-
-dist_data = [s.velocity_ms for s in states]
-plt.plot(dist_data)
-plt.xlabel('Time (s)')
-plt.ylabel('Velocity (m/s)')
-plt.show()
-
-dist_data = [s.accel_ms2 for s in states]
-plt.plot(dist_data)
-plt.xlabel('Time (s)')
-plt.ylabel('Acceleration (m/s2)')
-plt.show()
+plot([s.dist_m for s in states], 'Time (s)', 'Altitude (m)')
+plot([s.velocity_ms for s in states], 'Time (s)', 'Velocity (m/s)')
+plot([s.accel_ms2 for s in states], 'Time (s)', 'Acceleration (m/s2)')
