@@ -17,22 +17,25 @@ def single_stage() -> Vehicle:
     return Vehicle(comp_burn, burn_stage, [], None, state)
 
 
-def sim(v: Vehicle) -> List[VehicleState]:
+def sim(v: Vehicle, dt: float) -> List[VehicleState]:
     """
     :param v: vehicle to simulate.
+    :param dt: time step, i.e. resolution.
     :return: acceleration, velocity, and altitude of vehicle until it returns to ground.
     """
     dt = 0.1
-    end_time_s = 5.0
-    curr_time = 0.0
-
     states = []
 
-    while curr_time < end_time_s:
+    def touched_down() -> bool:
+        if len(states) == 0:
+            return False
+
+        s = states[-1]
+        return s.velocity_ms < 0 and s.dist_m <= 0
+
+    while not touched_down():
         v = v.step(dt)
         states.append(v.state)
-
-        curr_time += dt
 
     return states
 
@@ -44,7 +47,7 @@ def plot(data: List[float], x_label: str, y_label: str):
     plt.show()
 
 
-states = sim(single_stage())
+states = sim(single_stage(), 0.1)
 
 plot([s.dist_m for s in states], 'Time (s)', 'Altitude (m)')
 plot([s.velocity_ms for s in states], 'Time (s)', 'Velocity (m/s)')
