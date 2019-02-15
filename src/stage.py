@@ -72,6 +72,9 @@ class Stage:
         self.f_propellant_mass_kg = f_propellant_mass_kg
         self.f_thrust_N = f_thrust_N
 
+    def total_mass_kg(self) -> float:
+        return self.engine_case_mass_kg + self.empty_mass_kg + self.propellant_mass_kg
+
     def step(self, dt: delta_time_s) -> 'Stage':
         """
         :param dt: delta time since last step.

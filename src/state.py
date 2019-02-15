@@ -33,20 +33,19 @@ class VehicleState:
         self.event = event
 
     def step(self, dt: float, time_s: float, stage: Stage) -> 'VehicleState':
-        dry_mass_kg = stage.empty_mass_kg + stage.engine_case_mass_kg
-        wet_mass_kg = dry_mass_kg + stage.propellant_mass_kg
+        mass_kg = stage.total_mass_kg()
 
         # 0.5*rho*Cd*A*SIGN(V)*V^2
         air_resistance_N = 0.5 * 1.2 * stage.drag_coefficient * stage.area_m2 * self.velocity_ms * abs(self.velocity_ms)
-        weight_N = wet_mass_kg * 9.81
+        weight_N = mass_kg * 9.81
         thrust_N = stage.thrust_N
         net_force_N = thrust_N - weight_N - air_resistance_N
 
-        accel_ms2 = net_force_N / wet_mass_kg
+        accel_ms2 = net_force_N / mass_kg
         velocity_ms = self.velocity_ms + accel_ms2 * dt
         dist_m = self.dist_m + self.velocity_ms * dt + 0.5 * self.accel_ms2 * dt**2
 
-        return VehicleState(None, time_s, wet_mass_kg, thrust_N, air_resistance_N, weight_N, net_force_N, accel_ms2, velocity_ms, dist_m)
+        return VehicleState(None, time_s, mass_kg, thrust_N, air_resistance_N, weight_N, net_force_N, accel_ms2, velocity_ms, dist_m)
 
     @staticmethod
     def zero() -> 'VehicleState':
