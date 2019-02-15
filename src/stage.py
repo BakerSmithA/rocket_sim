@@ -97,7 +97,7 @@ class Stage:
         :return: new state of the stage, e.g. with decreased mass.
         """
         if self.propellant_mass_kg > 0.0:
-            new_prop_mass = self.f_propellant_mass_kg(dt, self.propellant_mass_kg)
+            new_prop_mass = max(self.f_propellant_mass_kg(dt, self.propellant_mass_kg), 0.0)
             new_thrust_N = self.f_thrust_N(dt, self.thrust_N)
         else:
             new_prop_mass = 0.0

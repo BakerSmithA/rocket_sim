@@ -30,6 +30,7 @@ class VehicleState:
         air_resistance_N = 0.5 * 1.2 * stage.drag_coefficient * stage.area_m2 * sign(self.velocity_ms) * self.velocity_ms * self.velocity_ms
         drag_N = weight_N + air_resistance_N
         total_N = stage.thrust_N - drag_N
+        print(air_resistance_N)
 
         accel_ms2 = total_N / mass_kg
         velocity_ms = self.velocity_ms + accel_ms2
