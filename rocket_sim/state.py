@@ -17,7 +17,7 @@ class VehicleState:
     dist_m: float
 
     def __init__(self, event: Optional[str], time_s: float, mass_kg: float, thrust_N: float, air_resistance_N: float,
-                 weight_N: float, net_force_N, accel_ms: float, velocity_ms: float, dist_m: float):
+                 weight_N: float, net_force_N, accel_ms2: float, velocity_ms: float, dist_m: float):
         self.event = event
         self.time_s = time_s
         self.mass_kg = mass_kg
@@ -25,7 +25,7 @@ class VehicleState:
         self.net_force_N = net_force_N
         self.air_resistance_N = air_resistance_N
         self.weight_N = weight_N
-        self.accel_ms2 = accel_ms
+        self.accel_ms2 = accel_ms2
         self.velocity_ms = velocity_ms
         self.dist_m = dist_m
 
@@ -48,5 +48,5 @@ class VehicleState:
         return VehicleState(None, time_s, mass_kg, thrust_N, air_resistance_N, weight_N, net_force_N, accel_ms2, velocity_ms, dist_m)
 
     @staticmethod
-    def zero() -> 'VehicleState':
-        return VehicleState(None, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    def zero(time=0.0) -> 'VehicleState':
+        return VehicleState(None, time, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
