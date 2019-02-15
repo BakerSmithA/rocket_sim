@@ -1,9 +1,9 @@
 from rocket_sim.simulations import simulate
 from rocket_sim.calculations import apogee, maximum_acceleration, g_force
 from rocket_sim.graphics import time_series_plot_group
-from vehicle_examples import single_stage
+from vehicle_examples import single_stage, three_stage
 
-vehicle, vehicle_name = single_stage()
+vehicle, vehicle_name = three_stage()
 
 states = simulate(vehicle, dt=0.1)
 

@@ -16,7 +16,7 @@ def single_stage() -> Tuple[Vehicle, str]:
     return Vehicle(comp_burn, burn_stage, [], None, VehicleState.zero()), 'Single Stage Vehicle'
 
 
-def single_stage_parachute() -> Vehicle:
+def single_stage_parachute() -> Tuple[Vehicle, str]:
     """
     :return: description of a single stage vehicle with a parachute.
     """
@@ -40,10 +40,10 @@ def single_stage_parachute() -> Vehicle:
                             propellant_mass_kg=0.0, thrust_N=0.0, f_propellant_mass_kg=const(),
                             f_thrust_N=const())
 
-    return Vehicle(comp_burn, burn_stage, [], parachute_stage, VehicleState.zero())
+    return Vehicle(comp_burn, burn_stage, [], parachute_stage, VehicleState.zero()), "Single Stage with Parachute"
 
 
-def three_stage() -> Vehicle:
+def three_stage() -> Tuple[Vehicle, str]:
     """
     :return: description of two stage vehicle without a parachute.
     """
@@ -93,4 +93,4 @@ def three_stage() -> Vehicle:
                    f_thrust_N=const(),
                    )
 
-    return Vehicle(comp_burn1, stage1, [stage2, stage3], None, VehicleState.zero())
+    return Vehicle(comp_burn1, stage1, [stage2, stage3], None, VehicleState.zero()), "Three Stage"
