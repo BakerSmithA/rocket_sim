@@ -11,7 +11,8 @@ def single_stage() -> Vehicle:
     """
     comp_burn = Id('Burn', [])
     burn_stage = Stage(area_m2=0.000979, drag_coefficient=0.75, empty_mass_kg=0.106, engine_case_mass_kg=0.0248,
-                       propellant_mass_kg=0.0215, thrust_N=6.38, f_propellant_mass_kg=linear(-0.00342925), f_thrust_N=const())
+                       propellant_mass_kg=0.0215, thrust_N=6.38, f_propellant_mass_kg=linear(-0.00342925),
+                       f_thrust_N=const())
 
     return Vehicle(comp_burn, burn_stage, [], None, VehicleState.zero())
 
@@ -31,11 +32,13 @@ def single_stage_parachute() -> Vehicle:
 
     comp_burn.add_transition(deploy_parachute)
 
-    burn_stage = Stage(area_m2=0.005, drag_coefficient=0.75, empty_mass_kg=1.0, engine_case_mass_kg=0.015,
-                       propellant_mass_kg=0.0015, thrust_N=15.0, f_propellant_mass_kg=linear(-0.0015), f_thrust_N=const())
+    burn_stage = Stage(area_m2=0.000979, drag_coefficient=0.75, empty_mass_kg=0.106, engine_case_mass_kg=0.0248,
+                       propellant_mass_kg=0.0215, thrust_N=6.38, f_propellant_mass_kg=linear(-0.00342925),
+                       f_thrust_N=const())
 
-    parachute_stage = Stage(area_m2=0.3, drag_coefficient=0.75, empty_mass_kg=1.0, engine_case_mass_kg=0.015,
-                            propellant_mass_kg=0.0, thrust_N=0.0, f_propellant_mass_kg=const(), f_thrust_N=const())
+    parachute_stage = Stage(area_m2=0.03, drag_coefficient=0.75, empty_mass_kg=0.106, engine_case_mass_kg=0.0248,
+                            propellant_mass_kg=0.0, thrust_N=0.0, f_propellant_mass_kg=const(),
+                            f_thrust_N=const())
 
     return Vehicle(comp_burn, burn_stage, [], parachute_stage, VehicleState.zero())
 
@@ -72,10 +75,11 @@ def plot(time: List[float], data: List[float], x_label: str, y_label: str):
     plt.show()
 
 
-states = sim(single_stage(), 0.1)
+states = sim(single_stage_parachute(), 0.1)
 
 time = [s.time_s for s in states]
 plot(time, [s.mass_kg for s in states], 'Time (s)', 'Mass (kg)')
-# plot([s.accel_ms2 for s in states], 'Time (s)', 'Acceleration (m/s2)')
-# plot([s.velocity_ms for s in states], 'Time (s)', 'Velocity (m/s)')
-# plot([s.dist_m for s in states], 'Time (s)', 'Altitude (m)')
+plot(time, [s.weight_N for s in states], 'Time (s)', 'Net Force (N)')
+plot(time, [s.accel_ms2 for s in states], 'Time (s)', 'Acceleration (m/s2)')
+plot(time, [s.velocity_ms for s in states], 'Time (s)', 'Velocity (m/s)')
+plot(time, [s.dist_m for s in states], 'Time (s)', 'Altitude (m)')
