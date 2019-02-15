@@ -10,8 +10,8 @@ def single_stage() -> Vehicle:
     :return: description of a single stage vehicle without a parachute.
     """
     comp_burn = Id('Burn', [])
-    burn_stage = Stage(area_m2=0.005, drag_coefficient=0.75, empty_mass_kg=1.0, engine_case_mass_kg=0.015,
-                       propellant_mass_kg=0.0015, thrust_N=15.0, f_propellant_mass_kg=linear(-0.0015), f_thrust_N=const())
+    burn_stage = Stage(area_m2=0.000979, drag_coefficient=0.75, empty_mass_kg=0.106, engine_case_mass_kg=0.0248,
+                       propellant_mass_kg=0.0215, thrust_N=6.38, f_propellant_mass_kg=linear(-0.00342925), f_thrust_N=const())
 
     return Vehicle(comp_burn, burn_stage, [], None, VehicleState.zero())
 
@@ -25,8 +25,7 @@ def single_stage_parachute() -> Vehicle:
 
     # Computer deploys parachute after starts falling.
     def deploy_parachute(prev: VehicleState, now: VehicleState, comp: CompState) -> Tuple[Optional[Action], CompState]:
-        dv = now.velocity_ms - prev.velocity_ms
-        if dv < -10.0:
+        if now.velocity_ms < 0.0:
             return Action.PARACHUTE, comp_descent
         return None, comp_burn
 
@@ -35,8 +34,8 @@ def single_stage_parachute() -> Vehicle:
     burn_stage = Stage(area_m2=0.005, drag_coefficient=0.75, empty_mass_kg=1.0, engine_case_mass_kg=0.015,
                        propellant_mass_kg=0.0015, thrust_N=15.0, f_propellant_mass_kg=linear(-0.0015), f_thrust_N=const())
 
-    parachute_stage = Stage(area_m2=0.005, drag_coefficient=0.75, empty_mass_kg=1.0, engine_case_mass_kg=0.015,
-                            propellant_mass_kg=0.0, thrust_N=15.0, f_propellant_mass_kg=const(), f_thrust_N=const())
+    parachute_stage = Stage(area_m2=0.3, drag_coefficient=0.75, empty_mass_kg=1.0, engine_case_mass_kg=0.015,
+                            propellant_mass_kg=0.0, thrust_N=0.0, f_propellant_mass_kg=const(), f_thrust_N=const())
 
     return Vehicle(comp_burn, burn_stage, [], parachute_stage, VehicleState.zero())
 
@@ -57,7 +56,7 @@ def sim(v: Vehicle, dt: float) -> List[VehicleState]:
         return s.velocity_ms < 0 and s.dist_m <= 0
 
     curr_time_s = 0.0
-    while not touched_down() and curr_time_s < 2.0:
+    while not touched_down():# and curr_time_s < 2.0:
         v = v.step(dt)
         states.append(v.state)
         curr_time_s += dt
@@ -65,16 +64,18 @@ def sim(v: Vehicle, dt: float) -> List[VehicleState]:
     return states
 
 
-def plot(data: List[float], x_label: str, y_label: str):
-    plt.plot(data)
+def plot(time: List[float], data: List[float], x_label: str, y_label: str):
+    print(data)
+    plt.plot(time, data)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.show()
 
 
-states = sim(single_stage_parachute(), 0.05)
+states = sim(single_stage(), 0.1)
 
-plot([s.mass_kg for s in states], 'Time (s)', 'Mass (kg)')
-plot([s.dist_m for s in states], 'Time (s)', 'Altitude (m)')
-plot([s.velocity_ms for s in states], 'Time (s)', 'Velocity (m/s)')
-plot([s.accel_ms2 for s in states], 'Time (s)', 'Acceleration (m/s2)')
+time = [s.time_s for s in states]
+plot(time, [s.mass_kg for s in states], 'Time (s)', 'Mass (kg)')
+# plot([s.accel_ms2 for s in states], 'Time (s)', 'Acceleration (m/s2)')
+# plot([s.velocity_ms for s in states], 'Time (s)', 'Velocity (m/s)')
+# plot([s.dist_m for s in states], 'Time (s)', 'Altitude (m)')

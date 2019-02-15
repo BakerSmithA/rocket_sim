@@ -22,25 +22,6 @@ def const() -> param(T):
     return lambda _, prev_x: prev_x
 
 
-def choice(threshold_s: total_time_s, pre: T, post: T) -> param(T):
-    """
-    :param threshold_s: time to switch value returned.
-    :param pre: value to return while t < threshold
-    :param post: value to return while time >= threshold_s
-    :return: pre if time is below the threshold, and return post otherwise.
-    """
-    total_time = 0.0
-
-    def f(dt: delta_time_s, _: T) -> T:
-        nonlocal total_time
-        total_time += dt
-        if total_time <= threshold_s:
-            return pre
-        return post
-
-    return f
-
-
 def linear(dx_per_sec: T) -> T:
     """
     Increase/decrease amount linearly.
