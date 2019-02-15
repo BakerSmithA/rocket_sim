@@ -26,7 +26,7 @@ def single_stage_parachute() -> Vehicle:
 
     # Computer deploys parachute after starts falling.
     def deploy_parachute(prev: VehicleState, now: VehicleState, comp: CompState) -> Tuple[Optional[Action], CompState]:
-        if now.velocity_ms < 0.0:
+        if now.velocity_ms < -5.0:
             return Action.PARACHUTE, comp_descent
         return None, comp_burn
 
@@ -58,11 +58,9 @@ def sim(v: Vehicle, dt: float) -> List[VehicleState]:
         s = states[-1]
         return s.velocity_ms < 0 and s.dist_m <= 0
 
-    curr_time_s = 0.0
-    while not touched_down():# and curr_time_s < 2.0:
+    while not touched_down():
         v = v.step(dt)
         states.append(v.state)
-        curr_time_s += dt
 
     return states
 
