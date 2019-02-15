@@ -4,7 +4,7 @@ from rocket_sim.flight_comp import Action, CompState, Id
 from rocket_sim.stage import Stage, linear, const
 
 
-def single_stage() -> Vehicle:
+def single_stage() -> Tuple[Vehicle, str]:
     """
     :return: description of a single stage vehicle without a parachute.
     """
@@ -13,7 +13,7 @@ def single_stage() -> Vehicle:
                        propellant_mass_kg=0.0215, thrust_N=6.38, f_propellant_mass_kg=linear(-0.00342925),
                        f_thrust_N=const())
 
-    return Vehicle(comp_burn, burn_stage, [], None, VehicleState.zero())
+    return Vehicle(comp_burn, burn_stage, [], None, VehicleState.zero()), 'Single Stage Vehicle'
 
 
 def single_stage_parachute() -> Vehicle:

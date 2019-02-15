@@ -1,10 +1,11 @@
 from rocket_sim.simulations import simulate
 from rocket_sim.calculations import apogee, maximum_acceleration, g_force
-from rocket_sim.graphics import plot
+from rocket_sim.graphics import time_series_plot_group
 from vehicle_examples import single_stage
 
+vehicle, vehicle_name = single_stage()
 
-states = simulate(single_stage(), dt=0.1)
+states = simulate(vehicle, dt=0.1)
 
 apogee_m, apogee_time_s = apogee(states)
 impact_velocity_ms = states[-1].velocity_ms
@@ -15,10 +16,17 @@ time = [s.time_s for s in states]
 events = [(s.time_s, s.event) for s in states if s.event is not None]
 events.append((apogee_time_s, 'Apogee'))
 
-plot(time, [s.mass_kg for s in states], events, 'Time (s)', 'Mass (kg)')
-plot(time, [s.accel_ms2 for s in states], events, 'Time (s)', 'Acceleration (m/s2)')
-plot(time, [s.velocity_ms for s in states], events, 'Time (s)', 'Velocity (m/s)')
-plot(time, [s.dist_m for s in states], events, 'Time (s)', 'Altitude (m)')
+
+time_series_plot_group(vehicle_name, [
+    (time, [s.mass_kg for s in states], events, 'Time (s)', 'Mass (kg)'),
+    (time, [s.accel_ms2 for s in states], events, 'Time (s)', 'Acceleration (m/s2)'),
+    (time, [s.velocity_ms for s in states], events, 'Time (s)', 'Velocity (m/s)'),
+    (time, [s.dist_m for s in states], events, 'Time (s)', 'Altitude (m)'),
+    (time, [s.thrust_N for s in states], events, 'Time (s)', 'Thrust (N)'),
+    (time, [s.air_resistance_N for s in states], events, 'Time (s)', 'Air Resistance (N)'),
+    ]
+)
+
 
 print(f'Apogee           (m):   {apogee_m}')
 print(f'Time to apogee   (s):   {apogee_time_s}')
