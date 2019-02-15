@@ -16,6 +16,13 @@ time = [s.time_s for s in states]
 events = [(s.time_s, s.event) for s in states if s.event is not None]
 events.append((apogee_time_s, 'Apogee'))
 
+print(f'Apogee           (m):   {apogee_m}')
+print(f'Time to apogee   (s):   {apogee_time_s}')
+print(f'Time to land     (s):   {total_time - apogee_time_s}')
+print(f'Time             (s):   {total_time}')
+print(f'Impact Velocity  (m/s): {impact_velocity_ms}')
+print(f'Max G-force:            {g_force(max_accel_ms2)}')
+print(f'Max G-force time (s):   {max_accel_time_s}')
 
 time_series_plot_group(vehicle_name, [
     (time, [s.mass_kg for s in states], events, 'Time (s)', 'Mass (kg)'),
@@ -26,12 +33,3 @@ time_series_plot_group(vehicle_name, [
     (time, [s.air_resistance_N for s in states], events, 'Time (s)', 'Air Resistance (N)'),
     ]
 )
-
-
-print(f'Apogee           (m):   {apogee_m}')
-print(f'Time to apogee   (s):   {apogee_time_s}')
-print(f'Time to land     (s):   {total_time - apogee_time_s}')
-print(f'Time             (s):   {total_time}')
-print(f'Impact Velocity  (m/s): {impact_velocity_ms}')
-print(f'Max G-force:            {g_force(max_accel_ms2)}')
-print(f'Max G-force time (s):   {max_accel_time_s}')
