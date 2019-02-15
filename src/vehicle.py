@@ -44,6 +44,7 @@ class Vehicle:
         next_state = self.state.step(dt, new_total_time, self.stage)
         action, next_comp_state = self.computer_state.transition(self.state, next_state)
         next_stage, next_engine_stages = self._interpret(action)
+        next_state.set_event_name(Vehicle._interpret_event_name(action))
 
         return Vehicle(next_comp_state, next_stage.step(dt), next_engine_stages, self.parachute_stage, next_state)
 
@@ -65,3 +66,17 @@ class Vehicle:
             return self.parachute_stage, self.remaining_engine_stages
 
         raise RuntimeError('Unknown action')
+
+    @staticmethod
+    def _interpret_event_name(action: Optional[Action]) -> Optional[str]:
+        if action is None:
+            return None
+
+        elif action == Action.NEXT_STAGE:
+            return 'Stage'
+
+        elif action == Action.PARACHUTE:
+            return 'Parachute'
+
+        raise RuntimeError('Unknown action')
+

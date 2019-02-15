@@ -1,10 +1,12 @@
 from src.stage import Stage
+from typing import Optional
 
 
 class VehicleState:
     """
     State of rocket at given point in time. Used to record data to plot.
     """
+    event: Optional[str]
     time_s: float
     mass_kg: float
     thrust_N: float
@@ -15,7 +17,8 @@ class VehicleState:
     velocity_ms: float
     dist_m: float
 
-    def __init__(self,  time_s: float, mass_kg: float, thrust_N: float, air_resistance_N: float, weight_N: float, net_force_N, accel_ms: float, velocity_ms: float, dist_m: float):
+    def __init__(self, event: Optional[str], time_s: float, mass_kg: float, thrust_N: float, air_resistance_N: float, weight_N: float, net_force_N, accel_ms: float, velocity_ms: float, dist_m: float):
+        self.event = event
         self.time_s = time_s
         self.mass_kg = mass_kg
         self.thrust_N = thrust_N
@@ -25,6 +28,9 @@ class VehicleState:
         self.accel_ms2 = accel_ms
         self.velocity_ms = velocity_ms
         self.dist_m = dist_m
+
+    def set_event_name(self, event: str):
+        self.event = event
 
     def step(self, dt: float, time_s: float, stage: Stage) -> 'VehicleState':
         dry_mass_kg = stage.empty_mass_kg + stage.engine_case_mass_kg
@@ -40,8 +46,8 @@ class VehicleState:
         velocity_ms = self.velocity_ms + accel_ms2 * dt
         dist_m = self.dist_m + self.velocity_ms * dt + 0.5 * self.accel_ms2 * dt**2
 
-        return VehicleState(time_s, wet_mass_kg, thrust_N, air_resistance_N, weight_N, net_force_N, accel_ms2, velocity_ms, dist_m)
+        return VehicleState(None, time_s, wet_mass_kg, thrust_N, air_resistance_N, weight_N, net_force_N, accel_ms2, velocity_ms, dist_m)
 
     @staticmethod
     def zero() -> 'VehicleState':
-        return VehicleState(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        return VehicleState(None, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)

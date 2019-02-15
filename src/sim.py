@@ -65,9 +65,13 @@ def sim(v: Vehicle, dt: float) -> List[VehicleState]:
     return states
 
 
-def plot(time: List[float], data: List[float], x_label: str, y_label: str):
-    print(data)
+def plot(time: List[float], data: List[float], events: List[Tuple[float, str]], x_label: str, y_label: str):
     plt.plot(time, data)
+
+    for (event_time, event_name) in events:
+        plt.axvline(x=event_time, color='black', linewidth=0.5, linestyle='--')
+        plt.text(x=event_time, y=max(data), s=event_name)
+
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.show()
@@ -76,8 +80,10 @@ def plot(time: List[float], data: List[float], x_label: str, y_label: str):
 states = sim(single_stage_parachute(), 0.1)
 
 time = [s.time_s for s in states]
-plot(time, [s.mass_kg for s in states], 'Time (s)', 'Mass (kg)')
-plot(time, [s.weight_N for s in states], 'Time (s)', 'Net Force (N)')
-plot(time, [s.accel_ms2 for s in states], 'Time (s)', 'Acceleration (m/s2)')
-plot(time, [s.velocity_ms for s in states], 'Time (s)', 'Velocity (m/s)')
-plot(time, [s.dist_m for s in states], 'Time (s)', 'Altitude (m)')
+events = [(s.time_s, s.event) for s in states if s.event is not None]
+
+plot(time, [s.mass_kg for s in states], events, 'Time (s)', 'Mass (kg)')
+plot(time, [s.weight_N for s in states], events, 'Time (s)', 'Net Force (N)')
+plot(time, [s.accel_ms2 for s in states], events, 'Time (s)', 'Acceleration (m/s2)')
+plot(time, [s.velocity_ms for s in states], events, 'Time (s)', 'Velocity (m/s)')
+plot(time, [s.dist_m for s in states], events, 'Time (s)', 'Altitude (m)')
