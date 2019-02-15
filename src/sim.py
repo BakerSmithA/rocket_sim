@@ -26,7 +26,7 @@ def single_stage_parachute() -> Vehicle:
 
     # Computer deploys parachute after starts falling.
     def deploy_parachute(prev: VehicleState, now: VehicleState, comp: CompState) -> Tuple[Optional[Action], CompState]:
-        if now.velocity_ms < -5.0:
+        if now.velocity_ms < -7.0:
             return Action.PARACHUTE, comp_descent
         return None, comp_burn
 
@@ -36,7 +36,8 @@ def single_stage_parachute() -> Vehicle:
                        propellant_mass_kg=0.0215, thrust_N=6.38, f_propellant_mass_kg=linear(-0.00342925),
                        f_thrust_N=const())
 
-    parachute_stage = Stage(area_m2=0.08, drag_coefficient=0.75, empty_mass_kg=0.106, engine_case_mass_kg=0.0248,
+    # Mass as burn stage, as burn stage is not separated.
+    parachute_stage = Stage(area_m2=0.02, drag_coefficient=0.75, empty_mass_kg=0.106, engine_case_mass_kg=0.0248,
                             propellant_mass_kg=0.0, thrust_N=0.0, f_propellant_mass_kg=const(),
                             f_thrust_N=const())
 
@@ -68,11 +69,11 @@ def three_stage() -> Vehicle:
                    f_thrust_N=const())
 
     stage2 = Stage(area_m2=0.000979, drag_coefficient=0.75, empty_mass_kg=0.106+stage3.total_mass_kg(), engine_case_mass_kg=0.0248,
-                   propellant_mass_kg=0.0215, thrust_N=6.38, f_propellant_mass_kg=linear(-0.00342925),
+                   propellant_mass_kg=0.0215*2, thrust_N=6.38*2, f_propellant_mass_kg=linear(-0.00342925*2),
                    f_thrust_N=const())
 
     stage1 = Stage(area_m2=0.000979, drag_coefficient=0.75, empty_mass_kg=0.106+stage2.total_mass_kg(), engine_case_mass_kg=0.0248,
-                   propellant_mass_kg=0.0215, thrust_N=6.38, f_propellant_mass_kg=linear(-0.00342925),
+                   propellant_mass_kg=0.0215*3, thrust_N=6.38*3, f_propellant_mass_kg=linear(-0.00342925*3),
                    f_thrust_N=const())
 
     return Vehicle(comp_burn1, stage1, [stage2, stage3], None, VehicleState.zero())
@@ -115,20 +116,21 @@ def plot(time: List[float], data: List[float], events: List[Tuple[float, str]], 
     plt.show()
 
 
-states = sim(three_stage(), 0.1)
-
-time = [s.time_s for s in states]
-events = [(s.time_s, s.event) for s in states if s.event is not None]
-
-plot(time, [s.mass_kg for s in states], events, 'Time (s)', 'Mass (kg)')
-plot(time, [s.accel_ms2 for s in states], events, 'Time (s)', 'Acceleration (m/s2)')
-plot(time, [s.velocity_ms for s in states], events, 'Time (s)', 'Velocity (m/s)')
-plot(time, [s.dist_m for s in states], events, 'Time (s)', 'Altitude (m)')
+states = sim(single_stage(), 0.1)
 
 apogee_m, apogee_time_s = max([(s.dist_m, s.time_s) for s in states], key=lambda t: t[0])
 impact_velocity_ms = states[-1].velocity_ms
 max_accel_ms2, max_accel_time_s = max([(s.accel_ms2, s.time_s) for s in states], key=lambda t: t[0])
 total_time = states[-1].time_s
+
+time = [s.time_s for s in states]
+events = [(s.time_s, s.event) for s in states if s.event is not None]
+events.append((apogee_time_s, 'Apogee'))
+
+plot(time, [s.mass_kg for s in states], events, 'Time (s)', 'Mass (kg)')
+plot(time, [s.accel_ms2 for s in states], events, 'Time (s)', 'Acceleration (m/s2)')
+plot(time, [s.velocity_ms for s in states], events, 'Time (s)', 'Velocity (m/s)')
+plot(time, [s.dist_m for s in states], events, 'Time (s)', 'Altitude (m)')
 
 print('Apogee          (m):  ', apogee_m)
 print('Time to apogee  (s):  ', apogee_time_s)
