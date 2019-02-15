@@ -41,9 +41,9 @@ class Vehicle:
         :return: next state of the vehicle.
         """
         new_total_time = self.state.time_s + dt
-        action, next_comp_state = self.computer_state.transition(self.state, self.state)
-        next_stage, next_engine_stages = self._interpret(action)
         next_state = self.state.step(new_total_time, self.stage)
+        action, next_comp_state = self.computer_state.transition(self.state, next_state)
+        next_stage, next_engine_stages = self._interpret(action)
 
         return Vehicle(next_comp_state, next_stage.step(dt), next_engine_stages, self.parachute_stage, next_state)
 

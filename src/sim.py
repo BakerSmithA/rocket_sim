@@ -12,19 +12,33 @@ def single_stage() -> Vehicle:
     comp_burn = Id('Burn', [])
     burn_stage = Stage(area_m2=0.005, drag_coefficient=0.75, empty_mass_kg=1.0, engine_case_mass_kg=0.015,
                        propellant_mass_kg=0.0015, thrust_N=15.0, f_propellant_mass_kg=linear(-0.0015), f_thrust_N=const())
-    state = VehicleState.zero()
 
-    return Vehicle(comp_burn, burn_stage, [], None, state)
+    return Vehicle(comp_burn, burn_stage, [], None, VehicleState.zero())
 
 
-# def single_stage_parachute() -> Vehicle:
-#     """
-#     :return: description of a single stage vehicle with a parachute.
-#     """
-#     comp_burn = Id('Burn', [])
-#     comp_descent = Id('Descent', [])
-#
-#     return None
+def single_stage_parachute() -> Vehicle:
+    """
+    :return: description of a single stage vehicle with a parachute.
+    """
+    comp_burn = Id('Burn', [])
+    comp_descent = Id('Descent', [])
+
+    # Computer deploys parachute after starts falling.
+    def deploy_parachute(prev: VehicleState, now: VehicleState, comp: CompState) -> Tuple[Optional[Action], CompState]:
+        dv = now.velocity_ms - prev.velocity_ms
+        if dv < -3.0:
+            return Action.PARACHUTE, comp_descent
+        return None, comp_burn
+
+    comp_burn.add_transition(deploy_parachute)
+
+    burn_stage = Stage(area_m2=0.005, drag_coefficient=0.75, empty_mass_kg=1.0, engine_case_mass_kg=0.015,
+                       propellant_mass_kg=0.0015, thrust_N=15.0, f_propellant_mass_kg=linear(-0.0015), f_thrust_N=const())
+
+    parachute_stage = Stage(area_m2=0.06, drag_coefficient=0.75, empty_mass_kg=0.5, engine_case_mass_kg=0.015,
+                            propellant_mass_kg=0.0, thrust_N=0.0, f_propellant_mass_kg=const(), f_thrust_N=const())
+
+    return Vehicle(comp_burn, burn_stage, [], parachute_stage, VehicleState.zero())
 
 
 def sim(v: Vehicle, dt: float) -> List[VehicleState]:
@@ -58,7 +72,7 @@ def plot(data: List[float], x_label: str, y_label: str):
     plt.show()
 
 
-states = sim(single_stage(), 0.05)
+states = sim(single_stage_parachute(), 0.05)
 
 plot([s.dist_m for s in states], 'Time (s)', 'Altitude (m)')
 plot([s.velocity_ms for s in states], 'Time (s)', 'Velocity (m/s)')
