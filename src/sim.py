@@ -11,7 +11,7 @@ def single_stage() -> Vehicle:
     """
     comp_burn = Id('Burn', [])
     burn_stage = Stage(area_m2=0.5, empty_mass_kg=1.0, engine_case_mass_kg=0.015, propellant_mass_kg=0.0015,
-                       thrust_N=15.0, f_propellant_mass_kg=linear(-0.00075), f_thrust_N=const())
+                       thrust_N=15.0, f_propellant_mass_kg=linear(-0.0015), f_thrust_N=const())
     state = VehicleState.zero()
 
     return Vehicle(comp_burn, burn_stage, [], None, state)
@@ -23,7 +23,6 @@ def sim(v: Vehicle, dt: float) -> List[VehicleState]:
     :param dt: time step, i.e. resolution.
     :return: acceleration, velocity, and altitude of vehicle until it returns to ground.
     """
-    dt = 0.1
     states = []
 
     def touched_down() -> bool:
@@ -47,7 +46,7 @@ def plot(data: List[float], x_label: str, y_label: str):
     plt.show()
 
 
-states = sim(single_stage(), 0.1)
+states = sim(single_stage(), 0.05)
 
 plot([s.dist_m for s in states], 'Time (s)', 'Altitude (m)')
 plot([s.velocity_ms for s in states], 'Time (s)', 'Velocity (m/s)')
