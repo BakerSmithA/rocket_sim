@@ -23,6 +23,11 @@ class Simulation:
         return maximum_acceleration(self.states)
 
     @property
+    def maximum_velocity(self) -> Tuple[float, float]:
+        max_vel_ms, max_vel_time_s = max([(s.velocity_ms, s.time_s) for s in self.states], key=lambda t: t[0])
+        return max_vel_ms, max_vel_time_s
+
+    @property
     def apogee(self) -> Tuple[float, float]:
         return apogee(self.states)
 
