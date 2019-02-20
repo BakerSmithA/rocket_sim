@@ -5,16 +5,7 @@ total_time_s = float
 delta_time_s = float
 
 
-def param(X: Type) -> Type:
-    """
-    Return type of time based function, i.e. (Time, X) -> X
-    :param X: type returned by time dependent function.
-    :return: type of a function dependent on elapsed time and previous value.
-    """
-    return Callable[[delta_time_s, X], X]
-
-
-def const() -> param(T):
+def const() -> Callable[[delta_time_s, T], T]:
     """
     Parameter of stage which does not change over time from initial value.
     :return: function which returns previous value.
@@ -22,7 +13,7 @@ def const() -> param(T):
     return lambda _, prev_x: prev_x
 
 
-def linear(dx_per_sec: T) -> T:
+def linear(dx_per_sec: T) -> Callable[[delta_time_s, T], T]:
     """
     Increase/decrease amount linearly.
     :param dx_per_sec: amount to modify by per second.
@@ -48,8 +39,8 @@ class Stage:
     impulse_Ns: float
     thrust_N: float
 
-    f_propellant_mass_kg: param(float)
-    f_thrust_N: param(float)
+    f_propellant_mass_kg: Callable[[delta_time_s, float], float]
+    f_thrust_N: Callable[[delta_time_s, float], float]
 
     def __init__(self,
                  area_m2: float,
@@ -58,8 +49,8 @@ class Stage:
                  engine_case_mass_kg: float,
                  propellant_mass_kg: float,
                  thrust_N: float,
-                 f_propellant_mass_kg: param(float),
-                 f_thrust_N: param(float)):
+                 f_propellant_mass_kg: Callable[[delta_time_s, float], float],
+                 f_thrust_N: Callable[[delta_time_s, float], float]):
 
         self.area_m2 = area_m2
         self.drag_coefficient = drag_coefficient
