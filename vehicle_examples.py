@@ -9,9 +9,9 @@ def single_stage() -> Tuple[Vehicle, str]:
     :return: description of a single stage vehicle without a parachute.
     """
     comp_burn = Id('Burn', [])
-    burn_stage = Stage(area_m2=0.000979, drag_coefficient=0.75, empty_mass_kg=0.106, engine_case_mass_kg=0.0248,
-                       propellant_mass_kg=0.0215, thrust_N=6.38, f_propellant_mass_kg=linear(-0.00342925),
-                       f_thrust_N=const())
+    burn_stage = Stage(stage_time_s=0.0, area_m2=0.000979, drag_coefficient=0.75, empty_mass_kg=0.106,
+                       engine_case_mass_kg=0.0248, propellant_mass_kg=0.0215, thrust_N=6.38,
+                       f_propellant_mass_kg=linear(-0.00342925), f_thrust_N=const())
 
     return Vehicle(comp_burn, burn_stage, [], None, VehicleState.zero()), 'Single Stage Vehicle'
 
@@ -31,14 +31,14 @@ def single_stage_parachute() -> Tuple[Vehicle, str]:
 
     comp_burn.add_transition(deploy_parachute)
 
-    burn_stage = Stage(area_m2=0.000979, drag_coefficient=0.75, empty_mass_kg=0.106, engine_case_mass_kg=0.0248,
-                       propellant_mass_kg=0.0215, thrust_N=6.38, f_propellant_mass_kg=linear(-0.00342925),
-                       f_thrust_N=const())
+    burn_stage = Stage(stage_time_s=0.0, area_m2=0.000979, drag_coefficient=0.75, empty_mass_kg=0.106,
+                       engine_case_mass_kg=0.0248, propellant_mass_kg=0.0215, thrust_N=6.38,
+                       f_propellant_mass_kg=linear(-0.00342925), f_thrust_N=const())
 
     # Mass as burn stage, as burn stage is not separated.
-    parachute_stage = Stage(area_m2=0.02, drag_coefficient=0.75, empty_mass_kg=0.106, engine_case_mass_kg=0.0248,
-                            propellant_mass_kg=0.0, thrust_N=0.0, f_propellant_mass_kg=const(),
-                            f_thrust_N=const())
+    parachute_stage = Stage(stage_time_s=0.0, area_m2=0.02, drag_coefficient=0.75, empty_mass_kg=0.106,
+                            engine_case_mass_kg=0.0248, propellant_mass_kg=0.0, thrust_N=0.0,
+                            f_propellant_mass_kg=const(), f_thrust_N=const())
 
     return Vehicle(comp_burn, burn_stage, [], parachute_stage, VehicleState.zero()), "Single Stage with Parachute"
 
@@ -63,34 +63,34 @@ def three_stage() -> Tuple[Vehicle, str]:
     comp_burn1.add_transition(burn_stage(comp_burn1, comp_burn2))
     comp_burn2.add_transition(burn_stage(comp_burn2, comp_burn3))
 
-    stage3 = Stage(area_m2=0.000979,
+    stage3 = Stage(stage_time_s=0.0,
+                   area_m2=0.000979,
                    drag_coefficient=0.75,
                    empty_mass_kg=0.106,
                    engine_case_mass_kg=0.0248,
                    propellant_mass_kg=0.0215,
                    thrust_N=6.38,
                    f_propellant_mass_kg=linear(-0.00342925),
-                   f_thrust_N=const(),
-                   )
+                   f_thrust_N=const())
 
-    stage2 = Stage(area_m2=0.000979,
+    stage2 = Stage(stage_time_s=0.0,
+                   area_m2=0.000979,
                    drag_coefficient=0.75,
                    empty_mass_kg=0.106+stage3.total_mass_kg(),
                    engine_case_mass_kg=0.0248,
                    propellant_mass_kg=0.0215*2,
                    thrust_N=6.38*2,
                    f_propellant_mass_kg=linear(-0.00342925*2),
-                   f_thrust_N=const(),
-                   )
+                   f_thrust_N=const())
 
-    stage1 = Stage(area_m2=0.000979,
+    stage1 = Stage(stage_time_s=0.0,
+                   area_m2=0.000979,
                    drag_coefficient=0.75,
                    empty_mass_kg=0.106+stage2.total_mass_kg(),
                    engine_case_mass_kg=0.0248,
                    propellant_mass_kg=0.0215*3,
                    thrust_N=6.38*3,
                    f_propellant_mass_kg=linear(-0.00342925*3),
-                   f_thrust_N=const(),
-                   )
+                   f_thrust_N=const())
 
     return Vehicle(comp_burn1, stage1, [stage2, stage3], None, VehicleState.zero()), "Three Stage"
