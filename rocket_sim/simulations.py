@@ -1,7 +1,6 @@
-from typing import List,Tuple
+from typing import List, Tuple, Callable
 from .vehicle import Vehicle
 from .state import VehicleState
-from .calculations import apogee, maximum_acceleration, g_force
 from .graphics import time_series_plot_group
 
 
@@ -10,9 +9,28 @@ class Simulation:
     def __init__(self, states: List[VehicleState]):
         self.states = states
 
+    def _max_val(self, get_val: Callable[[VehicleState], float]) -> Tuple[float, float]:
+        """
+        :param get_val: return value to find maximum of.
+        :return: maximum value and time occurred.
+        """
+        vs = [(get_val(s), s.time_s) for s in self.states]
+        return max(vs, key=lambda v: v[0])
+
     @property
     def events(self):
-        return [(s.time_s, s.event) for s in self.states if s.event is not None]
+        es = [(s.time_s, s.event) for s in self.states if s.event is not None]
+
+        _, t = self.apogee
+        es.append((t, 'Apogee'))
+
+        return es
+
+    @property
+    def maximum_g_force(self) -> Tuple[float, float]:
+        g = 9.81
+        (a, t) = self._max_val(lambda s: s.accel_ms2)
+        return a/g, t
 
     @property
     def impact_velocity(self) -> float:
@@ -20,16 +38,15 @@ class Simulation:
 
     @property
     def maximum_acceleration(self) -> Tuple[float, float]:
-        return maximum_acceleration(self.states)
+        return self._max_val(lambda s: s.accel_ms2)
 
     @property
     def maximum_velocity(self) -> Tuple[float, float]:
-        max_vel_ms, max_vel_time_s = max([(s.velocity_ms, s.time_s) for s in self.states], key=lambda t: t[0])
-        return max_vel_ms, max_vel_time_s
+        return self._max_val(lambda s: s.velocity_ms)
 
     @property
     def apogee(self) -> Tuple[float, float]:
-        return apogee(self.states)
+        return self._max_val(lambda s: s.dist_m)
 
     @property
     def total_time(self) -> float:
@@ -38,11 +55,6 @@ class Simulation:
     @property
     def time_series(self) -> List[float]:
         return [s.time_s for s in self.states]
-
-    @property
-    def maximum_g_force(self):
-        max_acceleration, max_acceleration_time = self.maximum_acceleration
-        return g_force(max_acceleration), max_acceleration_time
 
     def display_plots(self, title) -> None:
         time_series_plot_group(title, [
@@ -74,12 +86,4 @@ def simulate(vehicle: Vehicle, dt: float) -> Simulation:
         vehicle = vehicle.step(dt)
         states.append(vehicle.state)
 
-    apogee_m, apogee_time_s = apogee(states)
-
-    for state in states:
-        if state.dist_m == apogee_m and state.time_s == apogee_time_s:
-            state.event = 'Apogee'
-
     return Simulation(states)
-
-
