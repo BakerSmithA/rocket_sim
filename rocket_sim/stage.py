@@ -1,8 +1,19 @@
-from typing import Callable, TypeVar
+from typing import Callable, TypeVar, List
+import math
 
 T = TypeVar('T')
 total_time_s = float
 delta_time_s = float
+
+
+def _to(f, x, nearest):
+    """
+    :param f: rounding function, e.g. ceiling, floor, round
+    :param x: number to round
+    :param nearest: number to round to
+    :return: x rounded to `nearest`
+    """
+    return nearest * f(float(x) / nearest)
 
 
 def const() -> Callable[[delta_time_s, total_time_s, T], T]:
@@ -22,6 +33,33 @@ def linear(dx_per_sec: T) -> Callable[[delta_time_s, total_time_s, T], T]:
     def f(dt: delta_time_s, _: total_time_s, prev_x: T) -> T:
         dx = dx_per_sec * dt
         return prev_x + dx
+
+    return f
+
+
+def lerp(timestep_s: float, time_series: List[T]) -> Callable[[delta_time_s, total_time_s, T], T]:
+    """
+    :param timestep_s: time between successive values in time_series.
+    :param time_series: value at increments of `timestep_s` seconds.
+    :return: function which linearly interpolates between closest points of time series.
+    """
+    def f(_dt: delta_time_s, t: total_time_s, _prev_x: T) -> T:
+        low = int(max(_to(math.floor, t, timestep_s), 0))
+        high = int(min(_to(math.ceil, t, timestep_s), (len(time_series)-1)*timestep_s))
+
+        low_i = int(low / timestep_s)
+        high_i = int(high / timestep_s)
+
+        low_v = time_series[low_i]
+        high_v = time_series[high_i]
+
+        if low_i == high_i:
+            return low_v
+
+        m = (high_v - low_v) / (high - low)
+        # 'distance' t is from lower to upper bound.
+        x = t - low_i * timestep_s
+        return low_v + m * x
 
     return f
 
@@ -86,3 +124,8 @@ class Stage:
 
         return Stage(self.stage_time_s + dt, self.area_m2, self.drag_coefficient, self.empty_mass_kg,
                      self.engine_case_mass_kg, new_prop_mass, new_thrust_N, self.f_propellant_mass_kg, self.f_thrust_N)
+
+
+ts = [0, 1, 0.5]
+f = lerp(1, ts)
+print(f(0, 2.5, 0))
