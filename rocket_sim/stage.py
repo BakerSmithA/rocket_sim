@@ -124,8 +124,3 @@ class Stage:
 
         return Stage(self.stage_time_s + dt, self.area_m2, self.drag_coefficient, self.empty_mass_kg,
                      self.engine_case_mass_kg, new_prop_mass, new_thrust_N, self.f_propellant_mass_kg, self.f_thrust_N)
-
-
-ts = [0, 1, 0.5]
-f = lerp(1, ts)
-print(f(0, 2.5, 0))
