@@ -82,8 +82,10 @@ def simulate(vehicle: Vehicle, dt: float) -> Simulation:
         s = states[-1]
         return s.velocity_ms < 0 and s.dist_m <= 0
 
-    while not touched_down():
+    t = 0.0
+    while not touched_down() or t < 5.0:
         vehicle = vehicle.step(dt)
         states.append(vehicle.state)
+        t += dt
 
     return Simulation(states)
