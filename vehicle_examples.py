@@ -4,11 +4,27 @@ from rocket_sim.flight_comp import Action, CompState, Id
 from rocket_sim.stage import Stage, linear, const, lerp
 
 
-def single_stage() -> Tuple[Vehicle, str]:
+def single_stage_const_thrust() -> Tuple[Vehicle, str]:
     """
     :return: description of a single stage vehicle without a parachute.
     """
-    ts = [0.5, 8, 6, 5, 5, 5, 0]
+    ts = [8, 8, 6, 5, 5, 5, 0]
+    f = lerp(1.0, ts)
+
+    comp_burn = Id('Burn', [])
+    burn_stage = Stage(stage_time_s=0.0, area_m2=0.000979, drag_coefficient=0.75, empty_mass_kg=0.106,
+                       engine_case_mass_kg=0.0248, propellant_mass_kg=0.0215, thrust_N=6.38,
+                       f_propellant_mass_kg=linear(-0.00342925), f_thrust_N=const())
+
+    return Vehicle(comp_burn, burn_stage, [], None, VehicleState.zero()), 'Single Stage Vehicle'
+
+
+def single_stage_var_thrust() -> Tuple[Vehicle, str]:
+    """
+    :return: description of a single stage vehicle without a parachute, where
+        the thrust of the motor changes over time.
+    """
+    ts = [8, 8, 6, 5, 5, 5, 0]
     f = lerp(1.0, ts)
 
     comp_burn = Id('Burn', [])
@@ -16,7 +32,7 @@ def single_stage() -> Tuple[Vehicle, str]:
                        engine_case_mass_kg=0.0248, propellant_mass_kg=0.0215, thrust_N=0,
                        f_propellant_mass_kg=linear(-0.00342925), f_thrust_N=f)
 
-    return Vehicle(comp_burn, burn_stage, [], None, VehicleState.zero()), 'Single Stage Vehicle'
+    return Vehicle(comp_burn, burn_stage, [], None, VehicleState.zero()), 'Single Stage Vehicle (Variable Thrust)'
 
 
 def single_stage_parachute() -> Tuple[Vehicle, str]:

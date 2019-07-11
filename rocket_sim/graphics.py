@@ -21,7 +21,7 @@ def time_series_plot_group(title, plot_data):
     cols = 2
     rows = math.ceil(len(plot_data) / cols)
 
-    fig, ax = plt.subplots(nrows=rows, ncols=cols)
+    fig, ax = plt.subplots(nrows=rows, ncols=cols, figsize=(20, 10))
 
     for i, row in enumerate(ax):
         for j, col in enumerate(row):
@@ -30,12 +30,5 @@ def time_series_plot_group(title, plot_data):
             if index < len(plot_data):
                 time_series_subplot(col, *plot_data[index])
 
+    plt.tight_layout()
     plt.show()
-
-
-
-
-
-
-
-

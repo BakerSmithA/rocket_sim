@@ -1,7 +1,7 @@
 from rocket_sim.simulations import simulate
-from vehicle_examples import single_stage, three_stage
+from vehicle_examples import single_stage_const_thrust, single_stage_var_thrust, single_stage_parachute, three_stage
 
-vehicle, vehicle_name = single_stage()
+vehicle, vehicle_name = three_stage()
 
 simulation = simulate(vehicle, dt=0.1)
 
