@@ -30,5 +30,5 @@ def time_series_plot_group(title, plot_data):
             if index < len(plot_data):
                 time_series_subplot(col, *plot_data[index])
 
-    plt.tight_layout()
+    plt.tight_layout(pad=3)
     plt.show()
