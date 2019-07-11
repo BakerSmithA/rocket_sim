@@ -1,2 +1,2 @@
-# rocket_sim
+# Rocket Simulator
 Simulates rocket forces. 
